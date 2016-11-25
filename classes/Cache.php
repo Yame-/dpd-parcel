@@ -57,6 +57,16 @@ class DisCache
           return true;
       }
     }
+
+    /**
+     * WordPress
+     */
+    if(defined('ABSPATH')){
+      if(is_callable('update_option')){
+        update_option($name, array('name' => $name, 'time' => $time, 'value' => serialize($value)));
+        return true;
+      }
+    }
     
     /** 
      * PRESTASHOP
@@ -129,6 +139,17 @@ class DisCache
           return unserialize($value);
       }
     }
+
+    /**
+     * WordPress
+     */
+    if(defined('ABSPATH')){
+      if(is_callable('update_option')){
+        $cache = get_option($name);
+        $cache['value'] = unserialize($cache['value']);
+        return $cache['value'];
+      }
+    }
     
     /** 
      * PRESTASHOP
@@ -198,6 +219,15 @@ class DisCache
       {
         if($cache->remove($name))
           return true;
+      }
+    }
+
+    /**
+     * WordPress
+     */
+    if(defined('ABSPATH')){
+      if(is_callable('update_option')){
+        delete_option('DIS_cache');
       }
     }
     
