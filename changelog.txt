@@ -1,0 +1,4 @@
+1.2.1
+ - Added field for Gmaps API
+ - Added cache support for WordPress
+ - Changed old icon to official DPD Pickup logo
