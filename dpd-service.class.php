@@ -32,6 +32,7 @@ class DPD_Service extends WC_Shipping_Method {
 		//$this->company_country	= $this->get_option('company_country');
 		$this->company_postcode	= $this->get_option('company_postcode');
 		$this->company_city		= $this->get_option('company_city');
+		$this->gmaps_api_key    = $this->get_option('gmaps_api_key');
 
 		// Save settings in admin if you have any defined
 		add_action( 'woocommerce_update_options_shipping_' . $this->id, array( $this, 'process_admin_options' ) );
@@ -71,6 +72,12 @@ class DPD_Service extends WC_Shipping_Method {
 				'title' => 'DPD Password',
 				'type' => 'password',
 				'label' => __('This is the password you got from DPD to login to their service', DPD_SERVICE_DOMAIN),
+				'desc_tip' => true
+			),
+			'gmaps_api_key' => array(
+				'title' => 'GMAPS api key',
+				'type' => 'password',
+				'label' => __('Your gmaps api key', DPD_SERVICE_DOMAIN),
 				'desc_tip' => true
 			),
 			'print_label' => array(
