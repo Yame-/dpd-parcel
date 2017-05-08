@@ -342,6 +342,11 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
 	// DPD Shipping Label creation on Order Dashboard
 	function dpd_service_add_shipping_label_box(){
 		global $post;
+
+		if( $post->post_type != 'shop_order' ){
+			return;
+		}
+		
 		$current_order = new WC_Order( $post->ID );
 
 		$dpd_options = get_option('woocommerce_dpd_Service_settings');
