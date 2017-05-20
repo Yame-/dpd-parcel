@@ -12,6 +12,40 @@ class DPD_Service extends WC_Shipping_Method {
 		$this->init();
 	}
 
+	function testCredentials($text=false){
+		$dpd_options = get_option('woocommerce_dpd_Service_settings');
+
+		// Include classes
+		require_once 'classes/Cache.php';
+		require_once 'classes/Logger.php';
+		#include 'classes/ParcelShopFinder.php';
+		#include 'classes/Shipment.php';
+		require_once 'classes/Login.php';
+
+		//print_r($_GET);
+
+		//$params = json_decode(file_get_contents('php://input'),true);
+		//print_r($params);
+		//print_r($_POST);
+
+		$dpd_login = new DisLogin($dpd_options['api_username'], $dpd_options['api_password'], $dpd_options['api']);
+
+
+		if( !$dpd_login->getToken() ){
+			if( !$text ){
+				return false;
+			} else {
+				return '<span class="dpd_not_connected">FAILED</div>';
+			}
+		} else {
+			if( !$text ){
+				return true;
+			} else {
+				return '<span class="dpd_connected">SUCCESS</div>';
+			}
+		}
+	}
+
 	function init() {
 		// Load the settings API
 		$this->init_form_fields(); // This is part of the settings API. Override the method to add your own settings
@@ -44,6 +78,11 @@ class DPD_Service extends WC_Shipping_Method {
 	* Custom settings Kiala
 	*/
 	function init_form_fields(){
+
+		$apiTest = $this->testCredentials(true);
+
+		$help = (!$this->testCredentials()) ? __('Can\'t connect to the DPD API? Make sure that DPD activated your credentials.',DPD_SERVICE_DOMAIN) : '';
+
 		$this->form_fields = array(
 			'enabled' => array(
 				'title' => __('Enable', DPD_SERVICE_DOMAIN),
@@ -52,11 +91,12 @@ class DPD_Service extends WC_Shipping_Method {
 				'label' => __('Enable DPD Service', DPD_SERVICE_DOMAIN)
 			),
 			'api' => array(
-				'title' => __('API', DPD_SERVICE_DOMAIN),
+				'title' => __('API', DPD_SERVICE_DOMAIN) . $apiTest,
 				'type' => 'select',
 				'default' => 'Development (testing)',
 				'label' => __('This tells the DPD Library if we are testing or in production',DPD_SERVICE_DOMAIN),
-				'desc_tip' => true,
+				'desc_tip' => false,
+				'description' => $help,
 				'options' => array(
 					'https://public-dis-stage.dpd.nl/Services/' => __('Development (testing)',DPD_SERVICE_DOMAIN),
 					'https://public-dis.dpd.nl/Services/' => __('Production (live)',DPD_SERVICE_DOMAIN),
@@ -157,7 +197,7 @@ class DPD_Service extends WC_Shipping_Method {
 			'countries' 	=> array(
 				'type' => 'countries'
 			)
-		);
+		); 
 	}
 
 	public function calculate_shipping( $package = array() ) {

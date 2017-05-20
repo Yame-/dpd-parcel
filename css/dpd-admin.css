@@ -1,0 +1,13 @@
+.dpd_connected, .dpd_not_connected {
+	background: #34a52f;
+    font-size: .9em;
+    border-radius: 3px;
+    padding: .3em;
+    display: inline-block;
+    margin-left: 10px;
+    color: #FFF;
+}
+
+.dpd_not_connected {
+	background: #ff4c4c;
+}
