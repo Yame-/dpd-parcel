@@ -1,4 +1,11 @@
-1.2.1
+#1.3
+- Added language support en, nl, fr
+- Added return labels
+- Added clients e-mail to DPD label so they get alerted when their package will be deliverd.
+- Fixed grey map bug when DPD api is not connected or address could not be found.
+- Fixed bug where printed labels were marked as B2B instead of B2C
+
+#1.2.1
  - Added field for Gmaps API
  - Added cache support for WordPress
  - Changed old icon to official DPD Pickup logo

@@ -2,12 +2,26 @@ jQuery(document).ready(function($){
 
     var gMap = null;
 
+    var checkForAddress = function(){
+        if( typeof addDPDMarkers == "function" ){
+            addDPDMarkers(gMap);
+        } else {
+            // Address not found or API invalid.
+            console.log( 'Gmaps did could not find address / DPD API is not connected.' );
+            $('#overlay').hide();
+            $('#map').hide();
+
+            $('.address_error').show();
+            $('.openDPDParcelMap').hide();            
+        }
+    }
+
     function initMap( map ) {
         gMap = new google.maps.Map(map, {
             zoom: 4
         });
 
-        addDPDMarkers(gMap);
+        checkForAddress();
     }
 
     // Hide, and init map;

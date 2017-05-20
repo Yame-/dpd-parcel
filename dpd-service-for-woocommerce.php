@@ -3,10 +3,12 @@
  * Plugin Name: DPD Service for WooCommerce
  * Plugin URI: http://yame.be/plugins/dpd
  * Description: Enables the posibility to integrate DPD Parcel Shop Finder service into your e-commerce store with a breeze.
- * Version: 1.2.1
+ * Version: 1.3
  * Author: Yame
  * Author URI: http://yame.be/
  * License: GPL
+ * Text Domain: dpd-service-for-woocommerce
+ * Domain Path: /languages
  */
 
 // Prevent direct file access
@@ -30,6 +32,12 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
 	    wp_enqueue_style( 'dpd-service-style', plugins_url( '/style.css', __FILE__ ) );
 	}
 	add_action( 'wp_enqueue_scripts', 'dpd_load_scripts' );
+
+	// Translations
+	function my_plugin_load_plugin_textdomain() {
+	    $lel = load_plugin_textdomain( DPD_SERVICE_DOMAIN, FALSE, basename( dirname( __FILE__ ) ) . '/languages/' );
+	}
+	add_action( 'plugins_loaded', 'my_plugin_load_plugin_textdomain' );
 
 	// Add shipping service
 	function dpd_service(){
@@ -211,6 +219,8 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
 				?>
 				<h3 id="order_review_heading"><?= __('Select your DPD Parcel Shop', DPD_SERVICE_DOMAIN); ?></h3>
 
+				<p class="address_error"><?= __('We were not able to locate your address, please try another one.', DPD_SERVICE_DOMAIN) ?></p>
+
 				<a href="#" class="openDPDParcelMap"><?= __('Choose your DPD Parcel Shop', DPD_SERVICE_DOMAIN) ?></a>
 				<a href="#" class="otherDPDParcel"><?= __('Choose another DPD Parcel Shop', DPD_SERVICE_DOMAIN) ?></a>
 
@@ -346,7 +356,7 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
 		if( $post->post_type != 'shop_order' ){
 			return;
 		}
-		
+
 		$current_order = new WC_Order( $post->ID );
 
 		$dpd_options = get_option('woocommerce_dpd_Service_settings');
@@ -410,6 +420,79 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
     	}
 	}
 	add_action('add_meta_boxes', 'dpd_service_add_shipping_label_box');
+
+	// DPD Shipping Label creation on Order Dashboard
+	function dpd_service_add_shipping_return_label_box(){
+		global $post;
+
+		if( $post->post_type != 'shop_order' ){
+			return;
+		}
+
+		$current_order = new WC_Order( $post->ID );
+
+		$dpd_options = get_option('woocommerce_dpd_Service_settings');
+
+		if( $shipping_method == 'dpd_service' || $dpd_options['print_label'] == 'yes' ){
+			add_meta_box( 'meta-box-id-2', __( 'DPD Return Label', 'dpd_service' ), 'dpd_service_create_return_label_link', 'shop_order', 'side', 'high');
+		}
+
+    	function dpd_service_create_return_label_link(){
+    		global $post;
+
+    		$current_order = new WC_Order( $post->ID );
+
+    		$address = $current_order->get_address();
+    		$shipping = $current_order->get_address('shipping');
+
+    		$weight = 0;
+			if ( sizeof( $current_order->get_items() ) > 0 ) {
+				foreach( $current_order->get_items() as $item ) {
+					if ( $item['product_id'] > 0 ) {
+						$_product = $current_order->get_product_from_item( $item );
+						if ( ! $_product->is_virtual() ) {
+							$weight += $_product->get_weight() * $item['qty'];
+						}
+					}
+				}
+			}
+
+			$shipping_method = $current_order->get_items('shipping');
+			foreach( $shipping_method as $el ){
+				$shipping_id = $el['method_id'];
+			}
+			$shipping_method = $shipping_id;
+
+			$parcel = ($shipping_method == 'dpd_service') ? 'yes' : 'no';
+
+    		$url = add_query_arg(array(
+    			'page' 			=> 'dpd_download_shipment_label',
+    			'name'			=> $address['first_name'] . ' ' . $address['last_name'],
+    			'parcel_id' 	=> get_post_meta($post->ID, 'dpd_service_parcelID', true),
+    			'email' 		=> urlencode($address['email']),
+    			'phone' 		=> urlencode($address['phone']),
+    			'country' 		=> urlencode($shipping['country']),
+    			'street' 		=> urlencode($shipping['address_1']),
+    			'city' 			=> $shipping['city'],
+    			'postcode' 		=> $shipping['postcode'],
+    			'country' 		=> $shipping['country'],
+    			'email' 		=> $address['email'],
+    			'phone' 		=> $address['phone'],
+    			'weight'		=> $weight,
+    			'order_id'		=> $post->ID,
+    			'parcel'		=> $parcel,
+    			'return'		=> 'yes'
+
+    		),admin_url());
+    		?>
+		
+    		<a href="<?=$url?>" class="postDPDLabel" target="_blank"><?= __('Download DPD Return Label', DPD_SERVICE_DOMAIN) ?></a>
+    		<script>
+    		</script>
+    		<?php
+    	}
+	}
+	add_action('add_meta_boxes', 'dpd_service_add_shipping_return_label_box');
 
 	function dpd_service_add_shipping_details_admin(){
 		global $post;

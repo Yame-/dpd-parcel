@@ -71,7 +71,20 @@ $dpd_shipment->request = array(
 	)
 );
 
-if( $_GET['parcel'] == 'yes' ){
+if( $_GET['return'] == 'yes' ){
+	$dpd_shipment->request['order']['parcels'][0]['returns'] = 'true';
+}
+
+if( $_GET['return'] != 'yes'){
+	
+	$dpd_shipment->request['order']['productAndServiceData']['predict'] = array(
+		'channel' => 1,
+		'value' => htmlspecialchars($_GET['email']),
+	);
+
+}
+
+if( $_GET['parcel'] == 'yes' && $_GET['return'] != 'yes' ){
 
 	$dpd_shipment->request['order']['productAndServiceData']['parcelShopDelivery'] = array(
 		'parcelShopId' => htmlspecialchars($_GET['parcel_id']),
@@ -84,10 +97,17 @@ if( $_GET['parcel'] == 'yes' ){
 
 }
 
+/*echo '<pre>';
+print_r( $dpd_shipment->request) ;
+exit;*/
+
+
 $pdf = $dpd_shipment->send();
+print_r( $dpd_shipment->error );
 if( $pdf ){
 	//print_r( $pdf );
 	$PDFLabel = $pdf->orderResult->parcellabelsPDF;
+
 	header('Content-Type: application/pdf');
 	//header("Content-Disposition:attachment;filename='downloaded.pdf'");
 

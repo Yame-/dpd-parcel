@@ -108,3 +108,7 @@ html, body {
 	margin: 0;
 	padding: 0;
 }
+
+.address_error {
+	display: none;
+}
