@@ -160,7 +160,7 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
 			$js .= '"<div class=\'parcelClosed\'> '.__('Closed on ', DPD_SERVICE_DOMAIN).' '.implode(', ', $closed).'</div>" + ';
 			$js .= $open_;
 
-			$js .= '"<a href=\'#\' class=\'selectDPDParcel\' data-parcelID=\''.$s->parcelShopId.'\' data-street=\''.$s->street.'\' data-city=\''.$s->city.'\' data-postcode=\''.$s->zipCode.'\' data-name=\''.$s->company.'\'>Deliver my parcel here</a>" +
+			$js .= '"<a href=\'#\' class=\'selectDPDParcel\' data-parcelID=\''.$s->parcelShopId.'\' data-street=\''.$s->street.'\' data-city=\''.$s->city.'\' data-postcode=\''.$s->zipCode.'\' data-name=\''.$s->company.'\'>'.__('Deliver my parcel here', 'DPD_SERVICE_DOMAIN').'</a>" +
 			"</div>";
 
 	        marker_'.$i.'.addListener("click", function() {
@@ -199,11 +199,11 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
 
 				echo '<tr><td colspan="2">';
 
-				include 'classes/Cache.php';
-				include 'classes/Logger.php';
-				include 'classes/ParcelShopFinder.php';
-				include 'classes/Shipment.php';
-				include 'classes/Login.php';
+				require_once 'classes/Cache.php';
+				require_once 'classes/Logger.php';
+				require_once 'classes/ParcelShopFinder.php';
+				require_once 'classes/Shipment.php';
+				require_once 'classes/Login.php';
 
 				$dpd_options = get_option('woocommerce_dpd_Service_settings');
 
