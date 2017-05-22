@@ -8,11 +8,11 @@ require_once( $parse_uri[0] . 'wp-load.php' );
 $dpd_options = get_option('woocommerce_dpd_Service_settings');
 
 // Include classes
-include 'classes/Cache.php';
-include 'classes/Logger.php';
-include 'classes/ParcelShopFinder.php';
-include 'classes/Shipment.php';
-include 'classes/Login.php';
+require_once 'classes/Cache.php';
+require_once 'classes/Logger.php';
+require_once 'classes/ParcelShopFinder.php';
+require_once 'classes/Shipment.php';
+require_once 'classes/Login.php';
 
 //print_r($_GET);
 
