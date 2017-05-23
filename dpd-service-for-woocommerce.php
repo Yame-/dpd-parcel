@@ -3,7 +3,7 @@
  * Plugin Name: DPD Service for WooCommerce
  * Plugin URI: http://yame.be/plugins/dpd
  * Description: Enables the posibility to integrate DPD Parcel Shop Finder service into your e-commerce store with a breeze.
- * Version: 1.3.2
+ * Version: 1.3.3
  * Author: Yame
  * Author URI: http://yame.be/
  * License: GPL
@@ -412,7 +412,7 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
     			'country' 		=> $shipping['country'],
     			'email' 		=> $address['email'],
     			'phone' 		=> $address['phone'],
-    			'weight'		=> $weight,
+    			'weight'		=> wc_get_weight( $weight, 'g' ) / 10,
     			'order_id'		=> $post->ID,
     			'parcel'		=> $parcel,
 
