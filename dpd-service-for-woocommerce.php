@@ -484,7 +484,7 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
     			'country' 		=> $shipping['country'],
     			'email' 		=> $address['email'],
     			'phone' 		=> $address['phone'],
-    			'weight'		=> $weight,
+    			'weight'		=> wc_get_weight( $weight, 'g' ) / 10,
     			'order_id'		=> $post->ID,
     			'parcel'		=> $parcel,
     			'return'		=> 'yes'
