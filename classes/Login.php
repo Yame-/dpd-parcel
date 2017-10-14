@@ -132,7 +132,24 @@ class DisLogin
     $result = false;
     
     try {
-      $client = new SoapClient($this->getWebserviceUrl(self::WEBSERVICE_LOGIN));
+      //$client = new SoapClient($this->getWebserviceUrl(self::WEBSERVICE_LOGIN));
+      $url = $this->getWebserviceUrl(self::WEBSERVICE_LOGIN);
+          $opts = array(
+            'http'=>array(
+              'user_agent' => 'PHPSoapClient'
+            ),
+            'ssl' => array(
+              'verify_peer' => false,
+              'verify_peer_name' => false,
+              'allow_self_signed' => true,
+            )
+          );
+
+          $context = stream_context_create($opts);
+          $client = new SoapClient($url,
+              array('stream_context' => $context,
+                'cache_wsdl' => WSDL_CACHE_NONE)
+          );
       
       $result = $client->getAuth(array(
         'delisId' => $this->delisId

@@ -122,7 +122,24 @@ class DisParcelShopFinder
         && !$stop)
       {
         try {
-          $client = new SoapClient($this->login->getWebserviceUrl(self::WEBSERVICE_PARCELSHOP));
+          //$client = new SoapClient($this->login->getWebserviceUrl(self::WEBSERVICE_PARCELSHOP));
+          $url = $this->login->getWebserviceUrl(self::WEBSERVICE_PARCELSHOP);
+          $opts = array(
+            'http'=>array(
+              'user_agent' => 'PHPSoapClient'
+            ),
+            'ssl' => array(
+              'verify_peer' => false,
+              'verify_peer_name' => false,
+              'allow_self_signed' => true,
+            )
+          );
+
+          $context = stream_context_create($opts);
+          $client = new SoapClient($url,
+              array('stream_context' => $context,
+                'cache_wsdl' => WSDL_CACHE_NONE)
+          );
           
           $soapHeader = $this->login->getSoapHeader();
           $client->__setSoapHeaders($soapHeader);
