@@ -3,7 +3,7 @@
  * Plugin Name: DPD Service for WooCommerce
  * Plugin URI: http://yame.be/plugins/dpd
  * Description: Enables the posibility to integrate DPD Parcel Shop Finder service into your e-commerce store with a breeze.
- * Version: 1.3.4
+ * Version: 1.3.5
  * Author: Yame
  * Author URI: http://yame.be/
  * License: GPL
@@ -399,6 +399,12 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
 
 			$parcel = ($shipping_method == 'dpd_service') ? 'yes' : 'no';
 
+			$weight = wc_get_weight( $weight, 'g' ) / 10;
+			$_weight = $weight;
+
+			// Max weight of Parcel
+			$max_weight = ($parcel == 'no') ? 3150 : 2000;
+
     		$url = add_query_arg(array(
     			'page' 			=> 'dpd_download_shipment_label',
     			'name'			=> $address['first_name'] . ' ' . $address['last_name'],
@@ -412,15 +418,68 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
     			'country' 		=> $shipping['country'],
     			'email' 		=> $address['email'],
     			'phone' 		=> $address['phone'],
-    			'weight'		=> wc_get_weight( $weight, 'g' ) / 10,
+    			'weight'		=> '%weight%',
     			'order_id'		=> $post->ID,
     			'parcel'		=> $parcel,
 
     		),admin_url());
     		?>
-		
-    		<a href="<?=$url?>" class="postDPDLabel" target="_blank"><?= __('Download DPD Shipment Label', DPD_SERVICE_DOMAIN) ?></a>
+
+    		<?php
+    		if( $weight >= $max_weight ){
+			?>
+			<div class="generate-labels">
+			<h3><?= __('Geneereer labels...', DPD_SERVICE_DOMAIN); ?></h3>
+			<div class="total-weight"></div>
+			<?php for($i=1;$i<(($weight/$max_weight)+1);$i++){
+				
+				?>
+				<div><?= __('Gewicht label ', DPD_SERVICE_DOMAIN); ?> <?=$i?>: <input type="number" max="<?=$max_weight?>" class="labelpdf" name="label <?=$i?>" value="<?=($_weight > $max_weight) ? $max_weight : $_weight; ?>">g</div>
+				<?php
+				$_weight -= $max_weight;
+				}
+
+				?>
+				<br>
+				<a href="#" class="genlabels">Genereer PDF Labels</a>
+				</div>
+				<div class="generated-labels">
+				</div>
+				<?php
+
+    		} else {
+    		?>
+    		<a href="<?=str_replace('%weight%', $weight, $url);?>" class="postDPDLabel" target="_blank"><?= __('Download DPD Shipment Label', DPD_SERVICE_DOMAIN); ?></a>
+    		<?php
+    		}
+    		?>
+
     		<script>
+    		jQuery(document).ready(function($){
+
+    			$('.total-weight').html(' <?=$weight?>g / <strong><?=$weight?>g</strong><br><br> ');
+
+    			var total = 0;
+    			$('.labelpdf').on('input', function(){
+    				total = 0;
+				    $('.labelpdf').each(function(i,n){
+				        total += parseInt($(n).val(),10); 
+				      });
+					$('.total-weight').html(' '+total+'g / <strong><?=$weight?>g</strong><br><br> ');    				
+    			});
+
+    			var url = '<?=$url?>';
+    			jQuery('.genlabels').on('click', function(){
+
+    				jQuery('.generated-labels').html('<br>');
+
+    				jQuery('.labelpdf').each(function(d,i){
+    					console.log( i );
+    					jQuery('.generated-labels').append('<a href="'+url.replace('%weight%', jQuery(i).val())+'" target="_blank">Print '+ jQuery(i).attr('name') +'</a><br>');
+    				});
+
+    			});
+    		});
     		</script>
     		<?php
     	}
