@@ -1,7 +1,9 @@
 DPD Parcelshops for WordPress
 ======================
 
-Here, you can browse the source of the DPD Parcelshops for WordPress/WooCommerce project.
+We thank https://github.com/Yame-/dpd-parcel for his original project. Please feel free to visit.
+
+
 
 
 Bugs
