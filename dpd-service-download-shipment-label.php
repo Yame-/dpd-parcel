@@ -30,6 +30,7 @@ $dpd_shipment = new DisShipment($dpd_login);
 //$order_address = $order->get_address('shipping');
 
 // Prepare shipment request
+
 $dpd_shipment->request = array(
 	'printOptions' => array(
 		'printerLanguage' 	=> 'PDF',
@@ -37,12 +38,12 @@ $dpd_shipment->request = array(
 	),
 	'order' => array(
 		'generalShipmentData' => array(
-			'sendingDepot' => '0530',
+			'sendingDepot' => $dpd_login->getDepot(),
 			'product' => 'CL',
 			'sender' => array(
 				'name1' => $dpd_options['company_name'],
 				'street' => $dpd_options['company_street'],
-				'country' => 'BE',/*$dpd_options['company_country'],*/
+				'country' => 'NL',/*$dpd_options['company_country'],*/
 				'zipCode' => $dpd_options['company_postcode'],
 				'city' => $dpd_options['company_city'],
 				'customerNumber' => $dpd_options['api_username'],
@@ -76,7 +77,7 @@ if( $_GET['return'] == 'yes' ){
 }
 
 if( $_GET['return'] != 'yes'){
-	
+
 	$dpd_shipment->request['order']['productAndServiceData']['predict'] = array(
 		'channel' => 1,
 		'value' => htmlspecialchars($_GET['email']),
@@ -101,9 +102,8 @@ if( $_GET['parcel'] == 'yes' && $_GET['return'] != 'yes' ){
 print_r( $dpd_shipment->request) ;
 exit;*/
 
-
 $pdf = $dpd_shipment->send();
-print_r( $dpd_shipment->error );
+//print_r( $dpd_shipment->error );
 if( $pdf ){
 	//print_r( $pdf );
 	$PDFLabel = $pdf->orderResult->parcellabelsPDF;
@@ -116,5 +116,6 @@ if( $pdf ){
 	//readfile( $PDFLabel );
 	//echo $PDFLabel;
 }
+die();
 
 ?>

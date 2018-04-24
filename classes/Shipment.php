@@ -65,24 +65,7 @@ class DisShipment
       && !$stop)
     {
       try {
-        //$client = new SoapClient($this->login->getWebserviceUrl(self::WEBSERVICE_SHIPMENT), array('trace' => 1));
-        $url = $this->login->getWebserviceUrl(self::WEBSERVICE_SHIPMENT, array('trace' => 1));
-          $opts = array(
-            'http'=>array(
-              'user_agent' => 'PHPSoapClient'
-            ),
-            'ssl' => array(
-              'verify_peer' => false,
-              'verify_peer_name' => false,
-              'allow_self_signed' => true,
-            )
-          );
-
-          $context = stream_context_create($opts);
-          $client = new SoapClient($url,
-              array('stream_context' => $context,
-                'cache_wsdl' => WSDL_CACHE_NONE)
-          );
+        $client = new SoapClient($this->login->getWebserviceUrl(self::WEBSERVICE_SHIPMENT), array('trace' => 1));
         
         $soapHeader = $this->login->getSoapHeader();
         $client->__setSoapHeaders($soapHeader);

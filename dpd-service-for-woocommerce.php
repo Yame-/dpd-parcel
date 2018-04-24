@@ -1,11 +1,11 @@
 <?php
 /**
  * Plugin Name: DPD Service for WooCommerce
- * Plugin URI: http://yame.be/plugins/dpd
+ * Plugin URI: http://www.dpd.nl
  * Description: Enables the posibility to integrate DPD Parcel Shop Finder service into your e-commerce store with a breeze.
- * Version: 1.3.5
- * Author: Yame
- * Author URI: http://yame.be/
+ * Version: 1.0
+ * Author: DPD / Yame.be
+ * Author URI: https://github.com/DPDBenelux
  * License: GPL
  * Text Domain: dpd-service-for-woocommerce
  * Domain Path: /languages
@@ -49,13 +49,13 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
 	function dpd_service(){
 		if ( ! class_exists( 'DPD_Service' ) ) {
 			include 'dpd-service.class.php';
-		}	
+		}
 	}
 	add_action( 'woocommerce_shipping_init', 'dpd_service' );
 
 	// Register shipping method
 	function add_dpd_service( $methods ) {
-		$methods[] = 'dpd_service'; 
+		$methods[] = 'dpd_service';
 		return $methods;
 	}
 	add_filter( 'woocommerce_shipping_methods', 'add_dpd_service' );
@@ -91,7 +91,7 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
 			url: "'.plugins_url('/img/DPD_ParcelShop_icon.png',__FILE__).'", // url
 		    /*size: new google.maps.Size(50, 40), // size*/
 		    origin: new google.maps.Point(0,0), // origin
-		    anchor: new google.maps.Point(0, 0) // anchor 
+		    anchor: new google.maps.Point(0, 0) // anchor
 		}
 		function addDPDMarkers(map_){';
 
@@ -169,9 +169,9 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
 	          infoWindow.open(map_, marker_'.$i.');
 	        });
 			';
-			
+
 			$i++;
-		}	
+		}
 
 		// Set center
 		$js .= 'var bounds = new google.maps.LatLngBounds();
@@ -189,7 +189,7 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
 		global $woocommerce;
 
 		$shipping_method 	= $woocommerce->session->get('chosen_shipping_methods');
-		$postcode 			= $woocommerce->customer->get_postcode();
+		$postcode 			= $woocommerce->customer->get_billing_postcode();
 
 		if( $shipping_method[0] == 'dpd_service' ){
 
@@ -244,7 +244,7 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
 				<?php // Loop through found parcels for the address, feed them to JS also
 				if( count($result->shops) > 0): ?>
 
-					<?php // Loop and set distance ?> 
+					<?php // Loop and set distance ?>
 					<?php foreach( $result->shops as $shop ): ?>
 						<?php $shop->distance = distance($result->center->lat, $result->center->lng, $shop->latitude, $shop->longitude, 'K'); ?>
 					<?php endforeach; ?>
@@ -257,7 +257,7 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
 					<?php
 					$js_script = array();
 					?>
-			
+
 					<div class="dpd_service_shops">
 					<?php foreach( $result->shops as $shop ): ?>
 
@@ -300,9 +300,9 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
 	}
 	add_action('woocommerce_review_order_after_order_total', 'add_dpd_service_table');
 
-	// Form submit and validation 
+	// Form submit and validation
 	function dpd_service_save_dpd_parcel_shop( $order_id ) {
-		global $woocommerce; 
+		global $woocommerce;
 
 		if ( ! empty( $_POST['dpdParcel'] ) ) {
 	    	update_post_meta( $order_id, 'dpd_service_parcelID', sanitize_text_field( $_POST['dpdParcel'] ) );
@@ -322,12 +322,12 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
 	    }
 	}
 	add_action( 'woocommerce_checkout_update_order_meta', 'dpd_service_save_dpd_parcel_shop' );
-	
+
 	/*
 	* Validates if a DPD Parcel shop has been selected
 	*/
 	function dpd_service_parcel_shop_validation() {
-		global $woocommerce; 
+		global $woocommerce;
 
 		// If chosen DPD and parcel id is not found in hidden field or radio button, we show error
 		if($_POST['shipping_method'][0] == 'dpd_service' && (!$_POST['chosenParcelShopID'] && !$_POST['dpdParcel'])){
@@ -339,7 +339,7 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
 	// Add chosen DPD Parcel Shop to Order Details
 	function dpd_service_show_id_on_order_details($post){
 		?>
-		
+
 		<h2><?php echo __('Chosen DPD Parcel Shop', DPD_SERVICE_DOMAIN);?></h2>
 		<p>
 		<strong><?=get_post_meta($post->id, 'dpd_service_name', true)?></strong><br>
@@ -367,6 +367,7 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
 
 		$dpd_options = get_option('woocommerce_dpd_Service_settings');
 
+		$shipping_method = $current_order->get_items('shipping');
 		if( $shipping_method == 'dpd_service' || $dpd_options['print_label'] == 'yes' ){
 			add_meta_box( 'meta-box-id', __( 'DPD Shipping Label', 'dpd_service' ), 'dpd_service_create_label_link', 'shop_order', 'side', 'high');
 		}
@@ -399,12 +400,6 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
 
 			$parcel = ($shipping_method == 'dpd_service') ? 'yes' : 'no';
 
-			$weight = wc_get_weight( $weight, 'g' ) / 10;
-			$_weight = $weight;
-
-			// Max weight of Parcel
-			$max_weight = ($parcel == 'no') ? 3150 : 2000;
-
     		$url = add_query_arg(array(
     			'page' 			=> 'dpd_download_shipment_label',
     			'name'			=> $address['first_name'] . ' ' . $address['last_name'],
@@ -418,68 +413,15 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
     			'country' 		=> $shipping['country'],
     			'email' 		=> $address['email'],
     			'phone' 		=> $address['phone'],
-    			'weight'		=> '%weight%',
+    			'weight'		=> wc_get_weight( $weight, 'g' ) / 10,
     			'order_id'		=> $post->ID,
     			'parcel'		=> $parcel,
 
     		),admin_url());
     		?>
 
-    		<?php
-    		if( $weight >= $max_weight ){
-			?>
-			<div class="generate-labels">
-			<h3><?= __('Geneereer labels...', DPD_SERVICE_DOMAIN); ?></h3>
-			<div class="total-weight"></div>
-			<?php for($i=1;$i<(($weight/$max_weight)+1);$i++){
-				
-				?>
-				<div><?= __('Gewicht label ', DPD_SERVICE_DOMAIN); ?> <?=$i?>: <input type="number" max="<?=$max_weight?>" class="labelpdf" name="label <?=$i?>" value="<?=($_weight > $max_weight) ? $max_weight : $_weight; ?>">g</div>
-				<?php
-				$_weight -= $max_weight;
-				}
-
-				?>
-				<br>
-				<a href="#" class="genlabels">Genereer PDF Labels</a>
-				</div>
-				<div class="generated-labels">
-				</div>
-				<?php
-
-    		} else {
-    		?>
-    		<a href="<?=str_replace('%weight%', $weight, $url);?>" class="postDPDLabel" target="_blank"><?= __('Download DPD Shipment Label', DPD_SERVICE_DOMAIN); ?></a>
-    		<?php
-    		}
-    		?>
-
+    		<a href="<?=$url?>" class="postDPDLabel" target="_blank"><?= __('Download DPD Shipment Label', DPD_SERVICE_DOMAIN) ?></a>
     		<script>
-    		jQuery(document).ready(function($){
-
-    			$('.total-weight').html(' <?=$weight?>g / <strong><?=$weight?>g</strong><br><br> ');
-
-    			var total = 0;
-    			$('.labelpdf').on('input', function(){
-    				total = 0;
-				    $('.labelpdf').each(function(i,n){
-				        total += parseInt($(n).val(),10); 
-				      });
-					$('.total-weight').html(' '+total+'g / <strong><?=$weight?>g</strong><br><br> ');    				
-    			});
-
-    			var url = '<?=$url?>';
-    			jQuery('.genlabels').on('click', function(){
-
-    				jQuery('.generated-labels').html('<br>');
-
-    				jQuery('.labelpdf').each(function(d,i){
-    					console.log( i );
-    					jQuery('.generated-labels').append('<a href="'+url.replace('%weight%', jQuery(i).val())+'" target="_blank">Print '+ jQuery(i).attr('name') +'</a><br>');
-    				});
-
-    			});
-    		});
     		</script>
     		<?php
     	}
@@ -498,6 +440,7 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
 
 		$dpd_options = get_option('woocommerce_dpd_Service_settings');
 
+		$shipping_method = $current_order->get_items('shipping');
 		if( $shipping_method == 'dpd_service' || $dpd_options['print_label'] == 'yes' ){
 			add_meta_box( 'meta-box-id-2', __( 'DPD Return Label', 'dpd_service' ), 'dpd_service_create_return_label_link', 'shop_order', 'side', 'high');
 		}
@@ -550,7 +493,7 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
 
     		),admin_url());
     		?>
-		
+
     		<a href="<?=$url?>" class="postDPDLabel" target="_blank"><?= __('Download DPD Return Label', DPD_SERVICE_DOMAIN) ?></a>
     		<script>
     		</script>
@@ -629,26 +572,24 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
 	function remove_shipping_address_in_email( $shipping_methods ){
 		$shipping_methods[] = 'dpd_service';
 		return $shipping_methods;
-	}           
+	}
 	add_filter('woocommerce_order_hide_shipping_address', 'remove_shipping_address_in_email');
 
 	// Change address when parcel method
 	function change_address_parcel_method($address, $order){
 
-		$current_address = $order->get_formatted_billing_address();
-
 		// YES! Let's change output address
-		if( get_post_meta($order->id, 'dpd_service_parcelID', true) ){
+		if( get_post_meta($order->get_id(), 'dpd_service_parcelID', true) ){
 			$address = array(
-				'first_name'    => $current_address->billing_first_name,
-				'last_name'     => $current_address->billing_last_name,
-				'company'       => get_post_meta($order->id, 'dpd_service_name', true),
-				'address_1'     => get_post_meta($order->id, 'dpd_service_street', true),
-				'address_2'     => $current_address->billing_address_2,
-				'city'          => get_post_meta($order->id, 'dpd_service_city', true),
-				'state'         => $current_address->billing_state,
-				'postcode'      => get_post_meta($order->id, 'dpd_service_postcode', true),
-				'country'       => $current_address->billing_country
+				'first_name'    => $order->get_billing_first_name(),
+				'last_name'     => $order->get_billing_last_name(),
+				'company'       => get_post_meta($order->get_id(), 'dpd_service_name', true),
+				'address_1'     => get_post_meta($order->get_id(), 'dpd_service_street', true),
+				'address_2'     => $order->get_billing_address_2(),
+				'city'          => get_post_meta($order->get_id(), 'dpd_service_city', true),
+				'state'         => $order->get_billing_state(),
+				'postcode'      => get_post_meta($order->get_id(), 'dpd_service_postcode', true),
+				'country'       => $order->get_billing_country()
 			);
 
 			return $address;
