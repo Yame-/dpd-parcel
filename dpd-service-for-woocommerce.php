@@ -5,7 +5,7 @@
  * Description: Enables the posibility to integrate DPD Parcel Shop Finder service into your e-commerce store with a breeze.
  * Version: 1.0
  * Author: DPD / Yame.be
- * Author URI: https://hithub.com/DPDBenelux
+ * Author URI: https://github.com/DPDBenelux
  * License: GPL
  * Text Domain: dpd-service-for-woocommerce
  * Domain Path: /languages
