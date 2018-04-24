@@ -3,7 +3,7 @@
  * DIS Login
  *
  * This object will enable you to easily connect to the login service of our DIS web services.
- * 
+ *
  * @author: Michiel Van Gucht <michiel.vangucht@dpd.be>
  * @version: 1.0
  * @package: DIS Classes
@@ -15,26 +15,26 @@ class DisLogin
    * @const WEBSERVICE_LOGIN the final part of the url to the service.
    */
   CONST WEBSERVICE_LOGIN = 'LoginService.svc?wsdl';
-  
+
   /*
    * @const AUTHENTICATION_NAMESPACE Authentication namespace for the authentication header in soap requests.
    */
   CONST AUTHENTICATION_NAMESPACE = 'http://dpd.com/common/service/types/Authentication/2.0';
-  
+
   /**
    * The delisId
    * @access private
    * @var string
    */
   private $delisId;
-  
+
   /**
    * The password
    * @access private
    * @var string
    */
   private $password;
-  
+
   /**
    * The customerUid returned by the web service call
    * @access private
@@ -53,15 +53,15 @@ class DisLogin
    * @var string
    */
   private $depot;
-  
+
   /**
    * Get or set if the login has been refreshed.
    * <code>
    * <?php
    * $shipment = new DisShipment($cachedLogin);
-   * 
+   *
    * ... // $setting up the shipment.
-   * 
+   *
    * $shipment->send(); // Make the call to the shipment service
    *
    * if($shipment->login->refreshed) {
@@ -74,7 +74,7 @@ class DisLogin
    * @var bool
    */
   public $refreshed = false;
-  
+
   /**
    * Get or set the base url for the web services
    * Easy to switch between environments, but take your caching into account.
@@ -107,12 +107,12 @@ class DisLogin
     $this->delisId = $delisId;
     $this->password = $password;
     $this->url = $url;
-    
+
     // When the object is created it will always trigger a refresh because otherwise there wouldn't be a authToken available.
     $this->refresh();
   }
   }
-  
+
   /**
    * Refresh the authentication token. (eg: When a call to an other service throws an authentication error)
    */
@@ -123,34 +123,17 @@ class DisLogin
     $this->login();
     $this->refreshed = true;
   }
-  
+
   /**
    * The function that does the actual SOAP call to the web services.
    */
   private function login()
   {
     $result = false;
-    
-    try {
-      //$client = new SoapClient($this->getWebserviceUrl(self::WEBSERVICE_LOGIN));
-      $url = $this->getWebserviceUrl(self::WEBSERVICE_LOGIN);
-          $opts = array(
-            'http'=>array(
-              'user_agent' => 'PHPSoapClient'
-            ),
-            'ssl' => array(
-              'verify_peer' => false,
-              'verify_peer_name' => false,
-              'allow_self_signed' => true,
-            )
-          );
 
-          $context = stream_context_create($opts);
-          $client = new SoapClient($url,
-              array('stream_context' => $context,
-                'cache_wsdl' => WSDL_CACHE_NONE)
-          );
-      
+    try {
+      $client = new SoapClient($this->getWebserviceUrl(self::WEBSERVICE_LOGIN));
+
       $result = $client->getAuth(array(
         'delisId' => $this->delisId
         ,'password' => $this->password
@@ -162,13 +145,13 @@ class DisLogin
     {
       DisLogger::logSoapException($soapE);
     }
-    
+
     if(!$result)
     {
       DisLogger::log("Login failed", DisLogger::DEBUG);
       return false;
     }
-    else 
+    else
     {
       DisLogger::log("Login succeeded", DisLogger::DEBUG);
       $this->delisId = $result->return->delisId;
@@ -178,7 +161,7 @@ class DisLogin
       DisCache::set("DisLogin", $this);
     }
   }
-  
+
   /**
    * Get the soap header that has to be used with the other services
    * @return SOAPHeader
@@ -193,7 +176,7 @@ class DisLogin
 
     return new SOAPHeader(self::AUTHENTICATION_NAMESPACE, 'authentication', $soapHeaderBody, false);
   }
-  
+
   /**
    * Build the web service url from the base url (in the DisLogin object) and the provided end point
    * This function can be used by the other web service classes
@@ -203,7 +186,7 @@ class DisLogin
   public function getWebserviceUrl($serviceEndPoint)
   {
     $url = $this->url;
-    
+
     // Check if the url has a trailing slash, otherwise add it.
     // We do it here because the url variable is a public one
     if (substr($url, -1) != '/') {
@@ -212,7 +195,7 @@ class DisLogin
 
     return $url . $serviceEndPoint;
   }
-  
+
   /**
    * Use this function to determine if you need to create a new object or if you can use the cached one.
    * eg: When a switch between live and stage has been made by the user
@@ -223,7 +206,7 @@ class DisLogin
   {
     return ($this->url == $url);
   }
-  
+
   /**
    * Use this function to determine if you need to create a new object or if you can use the cached one.
    * eg: When a user has changed his password.
@@ -235,27 +218,27 @@ class DisLogin
   {
     return ($this->delisId == $delisId && $this->password == $password);
   }
-  
+
   /**
    * Get the delisId set in this object
    */
-  public function getDelisId() 
+  public function getDelisId()
   {
     return $this->delisId;
   }
-  
+
   /**
    * Get the customerUid returned by the soap call
    * (Will trigger a refresh when not yet set)
    */
-  public function getUid() 
+  public function getUid()
   {
     if(!$this->uid)
       $this->refresh();
-    
+
     return $this->uid;
   }
-  
+
   /**
    * Get the token returned by the soap call
    * (Will trigger a refresh when not yet set)
@@ -264,10 +247,10 @@ class DisLogin
   {
     if(!$this->token)
       $this->refresh();
-    
+
     return $this->token;
   }
-  
+
   /**
    * Get the depot returned by the soap call
    * (Will trigger a refresh when not yet set)
@@ -276,10 +259,10 @@ class DisLogin
   {
     if(!$this->depot)
       $this->refresh();
-    
+
     return $this->depot;
   }
-  
+
   /**
    * Get the url configured to be used in the current object
    */
@@ -287,7 +270,7 @@ class DisLogin
   {
     return $this->url;
   }
-  
+
   /**
    * Set the url configured to be used in the current object
    * (Will trigger a refresh when it differs from the previous url)
@@ -300,5 +283,5 @@ class DisLogin
       $this->refresh();
     }
   }
-  
+
 }
