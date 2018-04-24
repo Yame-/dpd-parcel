@@ -4,8 +4,8 @@
  * Plugin URI: http://www.dpd.nl
  * Description: Enables the posibility to integrate DPD Parcel Shop Finder service into your e-commerce store with a breeze.
  * Version: 1.0
- * Author: X-Interactive
- * Author URI: https://x-interactive.nl/
+ * Author: DPD / Yame.be
+ * Author URI: https://hithub.com/DPDBenelux
  * License: GPL
  * Text Domain: dpd-service-for-woocommerce
  * Domain Path: /languages
