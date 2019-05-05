@@ -29,14 +29,17 @@ class DisParcelShopFinder
    * @var array
    */
   public $result;
+
+  protected $googleAPIKey;
   
   /**
    * @param DisLogin $login
    */
-  public function __construct(DisLogin $login)  
+  public function __construct(DisLogin $login, $googleAPIKey)  
   {
     $this->result = new stdClass();
     $this->login = $login;
+    $this->googleAPIKey = $googleAPIKey;
   }
   
   /**
@@ -245,8 +248,8 @@ class DisParcelShopFinder
    */
   private function getGoogleMapsCenter($query)
   {
-  
-    $url = 'https://maps.googleapis.com/maps/api/geocode/json?address=' . urlencode($query) . '&sensor=false';
+
+    $url = 'https://maps.googleapis.com/maps/api/geocode/json?address=' . urlencode($query) . '&key=' .$this->googleAPIKey. '&sensor=false';
   
     if (function_exists('curl_version'))
   {

@@ -189,7 +189,7 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
 		global $woocommerce;
 
 		$shipping_method 	= $woocommerce->session->get('chosen_shipping_methods');
-		$postcode 			= $woocommerce->customer->get_postcode();
+		$postcode 			= $woocommerce->customer->get_billing_postcode();
 
 		if( $shipping_method[0] == 'dpd_service' ){
 
@@ -208,19 +208,22 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
 				$dpd_options = get_option('woocommerce_dpd_Service_settings');
 
 				$dpd_login = new DisLogin($dpd_options['api_username'], $dpd_options['api_password'], $dpd_options['api']);
-				$dpd_parcel = new DisParcelShopFinder($dpd_login);
+				$dpd_parcel = new DisParcelShopFinder($dpd_login, $dpd_options['gmaps_api_key']);
 
-				$result = $dpd_parcel->search(
-
-					array(
+				$args = array(
 						'Street' => $woocommerce->customer->get_shipping_address(),
 						'HouseNo' => '',
 						'Country' => $woocommerce->customer->get_shipping_country(),
 						'ZipCode' => $woocommerce->customer->get_shipping_postcode(),
 						'City' => $woocommerce->customer->get_shipping_city(),
-					)
+				);
+
+				$result = $dpd_parcel->search(
+
+					$args
 
 				);
+
 				/* Login for every req, should check if token is set => BAD */
 				?>
 				<h3 id="order_review_heading"><?= __('Select your DPD Parcel Shop', DPD_SERVICE_DOMAIN); ?></h3>
