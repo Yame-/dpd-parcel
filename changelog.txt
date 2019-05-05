@@ -1,3 +1,7 @@
+#1.3.6
+- [BUG] DPD Class couldn't encode input address. Google API key provided by the user is now passed.
+- Load google maps only on checkout
+
 #1.3.5
 - [BUG] Fixed a fatal error where labels would not print when order weight exceeded a fixed amount. A workaround for printing multiple labels has been implemented.
 
