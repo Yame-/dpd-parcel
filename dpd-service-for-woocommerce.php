@@ -23,13 +23,15 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
 	// Add gmap js
 	function dpd_load_scripts()
 	{
-		$dpd_options = get_option('woocommerce_dpd_Service_settings');
-		wp_enqueue_script( 'dpd-service-google-api', 'https://maps.googleapis.com/maps/api/js?sensor=false&key=' . $dpd_options['gmaps_api_key'] );
-		wp_register_script( 'dpd-service-map', plugins_url( '/js/dpd-service-gmap.js', __FILE__ ), array('jquery'), '1.0', true );
-	    if ( is_checkout() ) {
-	    	wp_enqueue_script( 'dpd-service-map');
+		if( is_checkout() ){
+			$dpd_options = get_option('woocommerce_dpd_Service_settings');
+			wp_enqueue_script( 'dpd-service-google-api', 'https://maps.googleapis.com/maps/api/js?sensor=false&key=' . $dpd_options['gmaps_api_key'] );
+			wp_register_script( 'dpd-service-map', plugins_url( '/js/dpd-service-gmap.js', __FILE__ ), array('jquery'), '1.0', true );
+		    if ( is_checkout() ) {
+		    	wp_enqueue_script( 'dpd-service-map');
+			}
+		    wp_enqueue_style( 'dpd-service-style', plugins_url( '/style.css', __FILE__ ) );
 		}
-	    wp_enqueue_style( 'dpd-service-style', plugins_url( '/style.css', __FILE__ ) );
 	}
 	add_action( 'wp_enqueue_scripts', 'dpd_load_scripts' );
 
